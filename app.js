@@ -85,8 +85,44 @@ class FactCheckingManager {
         console.log('Waiting for messages from backend...');
         console.log('Backend can send messages to: POST /.netlify/functions/receive-message');
         
-        // TODO: Send request to backend fact-checking endpoint
-        // const BACKEND_FACT_CHECK_URL = 'https://your-backend-url.com/api/fact-check';
+        // ============================================
+        // SEND REQUEST TO BACKEND FACT-CHECKING
+        // ============================================
+        // TODO: Replace BACKEND_FACT_CHECK_URL with actual backend URL
+        const BACKEND_FACT_CHECK_URL = 'https://your-backend-url.com/api/fact-check'; // <-- FILL BACKEND URL HERE
+        
+        try {
+            const response = await fetch(BACKEND_FACT_CHECK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: question,
+                    sessionId: this.sessionId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Request failed');
+            }
+
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('Fact-check request sent successfully to backend');
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+
+        } catch (error) {
+            console.error('Error sending fact-check request:', error);
+            this.removeLoadingIndicator();
+            this.addDivider();
+            this.addMessage('bot', 'Xin lỗi, đã có lỗi xảy ra khi gửi yêu cầu đến backend. Vui lòng thử lại.');
+            this.setWaitingState(false);
+            this.stopTimer();
+        }
     }
 
     /**
