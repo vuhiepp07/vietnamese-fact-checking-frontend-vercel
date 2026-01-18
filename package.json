@@ -1,0 +1,8 @@
+{
+  "name": "fact-checking-sys-fe",
+  "version": "1.0.0",
+  "description": "Fact-Checking System Frontend",
+  "dependencies": {
+    "@upstash/redis": "^1.30.0"
+  }
+}
