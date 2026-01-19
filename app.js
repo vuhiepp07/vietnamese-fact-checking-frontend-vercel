@@ -89,7 +89,7 @@ class FactCheckingManager {
         // SEND REQUEST TO BACKEND FACT-CHECKING
         // ============================================
         // TODO: Replace BACKEND_FACT_CHECK_URL with actual backend URL
-        const BACKEND_FACT_CHECK_URL = 'https://your-backend-url.com/api/fact-check'; // <-- FILL BACKEND URL HERE
+        const BACKEND_FACT_CHECK_URL = 'https://arlo-sloughy-vagally.ngrok-free.dev/api/v1/check-stream'; // <-- FILL BACKEND URL HERE
         
         try {
             const response = await fetch(BACKEND_FACT_CHECK_URL, {
