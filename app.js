@@ -103,13 +103,13 @@ class FactCheckingManager {
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('Request failed');
-            }
+            // if (!response.ok) {
+            //     throw new Error('Request failed');
+            // }
 
-            const result = await response.json();
+            // const result = await response.json();
             
-            if (result.success) {
+            if (response.ok == true && response.status == 200) {
                 console.log('Fact-check request sent successfully to backend');
             } else {
                 throw new Error(result.error || 'Unknown error');

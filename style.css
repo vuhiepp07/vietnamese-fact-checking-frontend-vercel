@@ -169,6 +169,12 @@ section {
     overflow-x: hidden;
     flex: 1;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages > * {
+    width: 100%;
 }
 
 .message {
@@ -254,6 +260,7 @@ section {
 .welcome-message {
     display: flex;
     align-items: flex-start;
+    margin-bottom: 12px;
 }
 
 .welcome-message .message-content {
