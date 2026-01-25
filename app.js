@@ -304,7 +304,7 @@ class FactCheckingManager {
     }
 
     /**
-     * Show completion message with time and cost statistics (streaming)
+     * Show completion message with time statistics (streaming)
      */
     showCompletionMessageWithStats(elapsedTime) {
         this.addDivider();
@@ -340,27 +340,11 @@ class FactCheckingManager {
         timeIcon.style.display = 'flex';
         timeIcon.style.alignItems = 'center';
         const timeText = document.createElement('span');
-        timeText.textContent = `${elapsedTime}s`;
+        timeText.textContent = '';
         timeText.style.fontWeight = '600';
+        timeText.style.marginLeft = '3px';
         timeContainer.appendChild(timeIcon);
         timeContainer.appendChild(timeText);
-        
-        const costContainer = document.createElement('div');
-        costContainer.style.display = 'flex';
-        costContainer.style.alignItems = 'center';
-        costContainer.style.gap = '1px';
-        const costIcon = document.createElement('span');
-        costIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>';
-        costIcon.style.display = 'flex';
-        costIcon.style.alignItems = 'center';
-        const costText = document.createElement('span');
-        costText.textContent = '9.99';
-        costText.style.fontWeight = '600';
-        costContainer.appendChild(costIcon);
-        costContainer.appendChild(costText);
-        
-        statsContainer.appendChild(timeContainer);
-        statsContainer.appendChild(costContainer);
         
         contentDiv.appendChild(p);
         contentDiv.appendChild(statsContainer);
@@ -372,9 +356,17 @@ class FactCheckingManager {
             this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
         }
         
+        const timeTextToStream = `Thời gian thực hiện: ${elapsedTime}s`;
+        
         this.streamText(p, completionText, () => {
-            this.isStreaming = false;
-            this.updateLoadingIndicator();
+            statsContainer.appendChild(timeContainer);
+            if (this.autoScrollEnabled) {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            this.streamText(timeText, timeTextToStream, () => {
+                this.isStreaming = false;
+                this.updateLoadingIndicator();
+            });
         });
     }
 
