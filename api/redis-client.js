@@ -1,4 +1,4 @@
-// Redis client helper for Netlify Functions
+// Redis client helper for Vercel Functions
 const { Redis } = require('@upstash/redis');
 
 let redisClient = null;
@@ -28,4 +28,3 @@ function getRedisClient() {
 }
 
 module.exports = { getRedisClient };
-

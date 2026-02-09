@@ -1,41 +1,31 @@
-// Netlify Function: Endpoint for backend to send messages
+// Vercel Function: Endpoint for backend to send messages
 const { getRedisClient } = require('./redis-client');
 
-exports.handler = async (event, context) => {
-    if (event.httpMethod !== 'POST') {
-        return {
-            statusCode: 405,
-            headers: {
-                'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({ error: 'Method not allowed' })
-        };
+module.exports = async (req, res) => {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
-        const data = JSON.parse(event.body);
-        const { sessionId, type, header, content } = data;
+        const { sessionId, type, header, content } = req.body;
 
         console.log('Received message:', { sessionId, type, header, content });
 
         if (!sessionId) {
-            return {
-                statusCode: 400,
-                headers: {
-                    'Access-Control-Allow-Origin': '*'
-                },
-                body: JSON.stringify({ error: 'sessionId is required' })
-            };
+            return res.status(400).json({ error: 'sessionId is required' });
         }
 
         if (!type || !header || !content) {
-            return {
-                statusCode: 400,
-                headers: {
-                    'Access-Control-Allow-Origin': '*'
-                },
-                body: JSON.stringify({ error: 'type, header, and content are required' })
-            };
+            return res.status(400).json({ error: 'type, header, and content are required' });
         }
 
         const redis = getRedisClient();
@@ -111,25 +101,12 @@ exports.handler = async (event, context) => {
             console.log('Message stored in memory. Total messages for session:', global.messageStore[sessionId].messages.length);
         }
 
-        return {
-            statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({
-                success: true,
-                message: 'Message received'
-            })
-        };
+        return res.status(200).json({
+            success: true,
+            message: 'Message received'
+        });
     } catch (error) {
         console.error('Error in receive-message:', error);
-        return {
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({ error: error.message })
-        };
+        return res.status(500).json({ error: error.message });
     }
 };

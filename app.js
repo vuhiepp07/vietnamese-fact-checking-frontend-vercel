@@ -83,7 +83,7 @@ class FactCheckingManager {
 
         console.log('Session ID:', this.sessionId);
         console.log('Waiting for messages from backend...');
-        console.log('Backend can send messages to: POST /.netlify/functions/receive-message');
+        console.log('Backend can send messages to: POST /api/receive-message');
         
         // ============================================
         // SEND REQUEST TO BACKEND FACT-CHECKING
@@ -166,7 +166,7 @@ class FactCheckingManager {
         }
 
         try {
-            const response = await fetch(`/.netlify/functions/get-message?sessionId=${this.sessionId}`);
+            const response = await fetch(`/api/get-message?sessionId=${this.sessionId}`);
             if (response.ok) {
                 const data = await response.json();
                 if (data.hasMessage) {
