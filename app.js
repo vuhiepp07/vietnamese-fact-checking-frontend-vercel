@@ -16,6 +16,7 @@ class FactCheckingManager {
         this.sessionId = null;
         this.timer = null;
         this.timerStartTime = null;
+        this.firstMessageRenderStartTime = null;
         this.isStreaming = false;
         this.loadingIndicator = null;
         
@@ -74,6 +75,7 @@ class FactCheckingManager {
         this.sessionId = this.generateSessionId();
         this.setWaitingState(true);
         this.startTimer();
+        this.firstMessageRenderStartTime = null;
 
         this.messageQueue = [];
         this.isRendering = false;
@@ -237,17 +239,27 @@ class FactCheckingManager {
             this.currentStreamingMessage = null;
         }
 
+        if (this.firstMessageRenderStartTime === null) {
+            this.firstMessageRenderStartTime = Date.now();
+            const ttft = ((this.firstMessageRenderStartTime - this.timerStartTime) / 1000).toFixed(2);
+            console.log(`Time to First Token (TTFT): ${ttft}s - Started rendering first message`);
+        }
+
         if (message.type === 'END') {
             const elapsedTime = this.stopTimer();
+            const ttft = this.firstMessageRenderStartTime 
+                ? ((this.firstMessageRenderStartTime - this.timerStartTime) / 1000).toFixed(2)
+                : null;
             
             this.renderMessageWithHeaderAndContent(message.header, message.content, () => {
-                this.showCompletionMessageWithStats(elapsedTime);
+                this.showCompletionMessageWithStats(elapsedTime, ttft);
                 this.setWaitingState(false);
                 this.currentStreamingMessage = null;
                 this.isRendering = false;
                 this.messageQueue = [];
                 this.clearLocalStorageQueue();
                 this.sessionId = null;
+                this.firstMessageRenderStartTime = null;
             });
         } else {
             this.renderMessageWithHeaderAndContent(message.header, message.content, () => {
@@ -306,7 +318,7 @@ class FactCheckingManager {
     /**
      * Show completion message with time statistics (streaming)
      */
-    showCompletionMessageWithStats(elapsedTime) {
+    showCompletionMessageWithStats(elapsedTime, ttft) {
         this.addDivider();
         const completionDiv = document.createElement('div');
         completionDiv.className = 'message bot-message';
@@ -326,10 +338,25 @@ class FactCheckingManager {
         statsContainer.className = 'completion-stats';
         statsContainer.style.marginTop = '12px';
         statsContainer.style.display = 'flex';
-        statsContainer.style.alignItems = 'center';
-        statsContainer.style.gap = '20px';
+        statsContainer.style.flexDirection = 'column';
+        statsContainer.style.gap = '8px';
         statsContainer.style.paddingTop = '12px';
         statsContainer.style.borderTop = '1px solid #e0e0e0';
+        
+        const ttftContainer = document.createElement('div');
+        ttftContainer.style.display = 'flex';
+        ttftContainer.style.alignItems = 'center';
+        ttftContainer.style.gap = '1px';
+        const ttftIcon = document.createElement('span');
+        ttftIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        ttftIcon.style.display = 'flex';
+        ttftIcon.style.alignItems = 'center';
+        const ttftText = document.createElement('span');
+        ttftText.textContent = '';
+        ttftText.style.fontWeight = '600';
+        ttftText.style.marginLeft = '3px';
+        ttftContainer.appendChild(ttftIcon);
+        ttftContainer.appendChild(ttftText);
         
         const timeContainer = document.createElement('div');
         timeContainer.style.display = 'flex';
@@ -356,16 +383,20 @@ class FactCheckingManager {
             this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
         }
         
-        const timeTextToStream = `Thời gian thực hiện: ${elapsedTime}s`;
+        const ttftTextToStream = ttft ? `Thời gian nhận được phản hồi đầu tiên (TTFT): ${ttft}s` : 'Thời gian nhận được phản hồi đầu tiên (TTFT): N/A';
+        const timeTextToStream = `Tổng thời gian thực hiện fact-checking: ${elapsedTime}s`;
         
         this.streamText(p, completionText, () => {
+            statsContainer.appendChild(ttftContainer);
             statsContainer.appendChild(timeContainer);
             if (this.autoScrollEnabled) {
                 this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
             }
-            this.streamText(timeText, timeTextToStream, () => {
-                this.isStreaming = false;
-                this.updateLoadingIndicator();
+            this.streamText(ttftText, ttftTextToStream, () => {
+                this.streamText(timeText, timeTextToStream, () => {
+                    this.isStreaming = false;
+                    this.updateLoadingIndicator();
+                });
             });
         });
     }
