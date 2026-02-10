@@ -103,15 +103,3 @@ npm install
 ### Port 3000 đã bị dùng
 Vercel sẽ tự động chọn port khác (3001, 3002...)
 
----
-
-## So sánh với Netlify
-
-| Netlify | Vercel |
-|---------|--------|
-| `netlify dev` | `vercel dev` |
-| `netlify/functions/` | `api/` |
-| `/.netlify/functions/get-message` | `/api/get-message` |
-| Port 8888 | Port 3000 |
-
-**Logic hoàn toàn giống nhau**, chỉ đổi platform!

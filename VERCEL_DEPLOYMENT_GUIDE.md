@@ -1,9 +1,5 @@
 # Hướng dẫn Deploy Frontend lên Vercel và Test Local
 
-## 📋 Tổng quan
-Source code này đã được migrate từ Netlify sang Vercel. Các serverless functions được chuyển từ `netlify/functions/` sang `api/` để tương thích với Vercel.
-
----
 
 ## 🚀 Deploy lên Vercel
 
@@ -283,7 +279,3 @@ Nếu có vấn đề, kiểm tra console logs:
 - [ ] Đã redeploy sau khi thêm env vars
 - [ ] Đã test API bằng Postman/curl
 - [ ] Đã test frontend flow hoàn chỉnh
-
----
-
-**Chúc mừng! Bạn đã migrate thành công từ Netlify sang Vercel! 🎉**
